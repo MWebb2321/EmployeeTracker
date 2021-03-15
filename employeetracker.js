@@ -89,11 +89,23 @@ function viewAllRoles() {
 }
 
 // View All Employees By Department
-function viewAllRoles() {
+function viewAllDepartments() {
     connection.query("SELECT employee.first_name, employee.last_name, department.name AS Department FROM employee JOIN role ON employee.role_id = role.id JOIN department ON role.department_id = department.id ORDER BY employee.id;",
     function(err, res) {
         if (err) throw err
         console.table(res)
         startPrompt()
     })
+}
+
+// Role Titles for Add Employee Prompt
+var roleArr = [];
+function selectRole() {
+    connection.query("SELECT * FROM role", function(err, res) {
+        if (err) throw err
+        for (var i = 0; i < res.length; i++) {
+            roleArr.push(res[i].title);
+        }
+    })
+    return roleArr;
 }
