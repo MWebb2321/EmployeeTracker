@@ -98,7 +98,7 @@ function viewAllDepartments() {
     })
 }
 
-// Role Titles for Add Employee Prompt
+// Role Titles for Add Employee Prompt (AEP)
 var roleArr = [];
 function selectRole() {
     connection.query("SELECT * FROM role", function(err, res) {
@@ -109,3 +109,17 @@ function selectRole() {
     })
     return roleArr;
 }
+
+// 
+var managerArr = [];
+function selectManager() {
+    connection.query("SELECT first_name, last_name FROM employee WHERE manager_id IS NULL", function(err, res) {
+        if (err) throw err
+        for (var i = 0; i < res.length; i++) {
+            managersArr.push(res[i].first_name);
+        }
+    })
+    return managerArr;
+}
+
+// 
