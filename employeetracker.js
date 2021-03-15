@@ -144,7 +144,7 @@ function addEmployee() {
         },
         {
             name: "choice",
-            type: "rawlist",
+            type: "rawList",
             message: "What's their managers name? ",
         }
     )).then(function (val) {
@@ -154,7 +154,7 @@ function addEmployee() {
         {
             first_name: val.firstName,
             last_name: val.lastName,
-            manager_Id: managerId;
+            manager_Id: managerId,
             role_Id: roleId
 
         }, function(err){
@@ -163,4 +163,48 @@ function addEmployee() {
             startPrompt()
         })
     })
+}
+
+// Updating Employee
+function updateEmployee() {
+    connection.query("SELECT employee.last_name, role.title FROM employee JOIN role ON employee.role_id;", function(err, res) {
+        //console.log(res)
+        if (err) throw err
+        console.log(res)
+        inquirer.prompt([
+            {
+                name: "lastName",
+                type: "rawList",
+                choices: function() {
+                    var lastName = [];
+                    for (var i = 0; i < res.length; i++) {
+                        lastName.push(res[i].last_name);
+                    }
+                    return lastName;
+                },
+                message: "What is the employees last name?",
+            },
+            {
+                name: "role",
+                type: "rawList",
+                message: "What is the employees new title?",
+                choices: selectRole()
+            },
+        ]).then(function(val) {
+            var roleId = selectRole().indexOf(val.role) + 1
+            connection.query("UPDATE employee SET WHERE ?",
+            {
+                last_name: val.lastName
+            
+            },
+            {
+                role_Id: roleId
+            },
+            function(err) {
+                if (err) throw err
+                console.table(val)
+                startPrompt()
+            })
+        });
+    });
 }
