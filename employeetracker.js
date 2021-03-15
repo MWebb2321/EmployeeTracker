@@ -114,7 +114,8 @@ function selectRole() {
 // 
 var managerArr = [];
 function selectManager() {
-    connection.query("SELECT first_name, last_name FROM employee WHERE manager_id IS NULL", function(err, res) {
+    connection.query("SELECT first_name, last_name FROM employee WHERE manager_id IS NULL", 
+    function(err, res) {
         if (err) throw err
         for (var i = 0; i < res.length; i++) {
             managersArr.push(res[i].first_name);
@@ -167,7 +168,8 @@ function addEmployee() {
 
 // Updating Employee
 function updateEmployee() {
-    connection.query("SELECT employee.last_name, role.title FROM employee JOIN role ON employee.role_id;", function(err, res) {
+    connection.query("SELECT employee.last_name, role.title FROM employee JOIN role ON employee.role_id;", 
+    function(err, res) {
         //console.log(res)
         if (err) throw err
         console.log(res)
@@ -208,3 +210,37 @@ function updateEmployee() {
         });
     });
 }
+
+// Add Employee Role
+function addRole() {
+    connection.query("SELECT role.title AS TITLE, role.salary AS Salary FROM role", 
+    function(err, res) {
+        inquirer.prompt([
+        {
+            name: "Title",
+            type: "input",
+            message: "What is the role title?" 
+        },
+        {
+            name: "Salary",
+            type: "input",
+            message: "What is the salary?"
+        }
+        ]).then(function(res) {
+            connection.query(
+                "INSERT INTO role SET?",
+                {
+                    title: res.Title,
+                    salary: res.Salary,
+                },
+                function(err){
+                    if (err) throw err
+                    console.table(res);
+                    startPrompt();
+                }
+            )
+        });
+    });
+}
+
+// Add Department
