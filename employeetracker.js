@@ -1,13 +1,14 @@
 // Dependencies
-const inquirer = require('inquirer');
-const mysql = require('mysql');
+const inquirer = require("inquirer");
+const mysql = require("mysql");
+const cTable = require("console.table");
 
 const connection = mysql.createConnection({
-    host: 'localhost',
+    host: "localhost",
     port: 3306,
-    user: 'root',
-    password: 'password',
-    database: ' employeetrackerDB'
+    user: "root",
+    password: "password",
+    database: "employeetrackerDB"
 });
 
 // Connection
@@ -22,46 +23,46 @@ function startPrompt() {
     inquirer.prompt([
         {
         
-            type: 'list',
-            message: 'What would you like to do?',
-            name: 'choice',
+            type: "list",
+            message: "What would you like to do?",
+            name: "choice",
             choices: [
-                'View All Employees?',
-                'View All Employees By Roles?',
-                'View All Employees By Department?',
-                'Update Employee?',
-                'Add Employee?',
-                'Add Role?',
-                'Add Department?',
+                "View All Employees?",
+                "View All Employees By Roles?",
+                "View All Employees By Department?",
+                "Update Employee?",
+                "Add Employee?",
+                "Add Role?",
+                "Add Department?",
             ]
         }
     ]).then(function(val) {
         switch (val.choice) {
-            case 'View All Employees?':
+            case "View All Employees?":
                 viewAllEmployees();
             break;
 
-            case 'View All Employees By Roles?':
+            case "View All Employees By Roles?":
                 viewAllRoles();
             break;
 
-            case 'View All Employees By Department?':
+            case "View All Employees By Department?":
                 viewAllDepartments();
             break;
 
-            case 'Update Employee?':
+            case "Update Employee?":
                 updateEmployee();
             break;
 
-            case 'Add Employee?':
+            case "Add Employee?":
                 addEmployee();
             break;
 
-            case 'Add Role?':
+            case "Add Role?":
                 addRole();
             break;
 
-            case 'Add Department?':
+            case "Add Department?":
                 addDepartment();
             break;
         }
@@ -78,7 +79,7 @@ function viewAllEmployees() {
   })
 }
 
-// View All Employees
+// View All Roles
 function viewAllRoles() {
     connection.query("SELECT employee.first_name, employee.last_name, role.title AS Title FROM employee JOIN role ON employee.role_id = role.id;",
     function(err, res) {
@@ -122,4 +123,44 @@ function selectManager() {
     return managerArr;
 }
 
-// 
+// Adding Employees
+function addEmployee() {
+    inquirer.prompt((
+        {
+            name: "firstName",
+            type: "input",
+            message: "Enter their first name? ",
+        },
+        {
+            name: "lastName",
+            type: "input",
+            message: "Enter their last name? ",
+        },
+        {
+            name: "role",
+            type: "list",
+            message: "What is their role? ",
+            choices: selectRole()
+        },
+        {
+            name: "choice",
+            type: "rawlist",
+            message: "What's their managers name? ",
+        }
+    )).then(function (val) {
+        var roleId = selectRole().indexOf(val.role) + 1
+        var managerId = selectManager().indexOf(val.choice) + 1
+        connection.query("INSET INTO employee SET ?", 
+        {
+            first_name: val.firstName,
+            last_name: val.lastName,
+            manager_Id: managerId;
+            role_Id: roleId
+
+        }, function(err){
+            if (err) throw err
+            console.table(val)
+            startPrompt()
+        })
+    })
+}
