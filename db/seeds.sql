@@ -1,3 +1,5 @@
+USE employeetrackerDB;
+
 --Department Seeds
 INSERT INTO department (name)
 VALUE ("Sales");
@@ -39,3 +41,7 @@ INSERT INTO employee (first_name, last_name, manager_id, role_id)
 VALUE ("Jill", "Kassidy", 1, 6);
 INSERT INTO employee (first_name, last_name, manager_id, role_id)
 VALUE ("Tiffany", "Star", 2, 7);
+
+SELECT * FROM department;
+SELECT * FROM role;
+SELECT * FROM employee;

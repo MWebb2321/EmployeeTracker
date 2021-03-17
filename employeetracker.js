@@ -1,87 +1,103 @@
 // Dependencies
 const inquirer = require("inquirer");
 const mysql = require("mysql");
-const cTable = require("console.table");
 
 const connection = mysql.createConnection({
     host: "localhost",
     port: 3306,
     user: "root",
     password: "Macleod2321!",
-    database: "employeetrackerDB"
+    // database: "employeetracker"
 });
 
+connection.connect(function(err) {
+    if(err) throw err
+    console.log("Connected as Id" + connection.threadId)
+    startPrompt();
+})
+
 // Initial Prompt
-const init = () => {
+const startPrompt = () => {
     inquirer.prompt([
         {
             type: "list",
             message: "What would you like to do?",
             name: "choice",
             choices: [
-                "View All Employees?",
-                "View All Employees By Roles?",
-                "View All Employees By Department?",
-                "Update Employee?",
-                "Add Employee?",
-                "Add Role?",
-                "Add Department?",
+                {
+                    name: 'View All Employees?',
+                    value: "viewAllEmployees",
+                },
+                {
+                    name: "View All Employees By Roles?",
+                    value: "viewAllRoles",
+                },
+                {
+                    name: "View All Employees By Department?",
+                    value: "viewALlDepartments",
+                },
+                {
+                    name: "Update Employee?",
+                    value: "updateEmployee",
+                },
+                {
+                    name: "Add Employee?",
+                    value: "addEmployee",
+                },
+                {
+                    name: "Add Role?",
+                    value: "addRole",
+                },
+                {
+                    name: "Add Department?",
+                    value: "addDepartment",
+                }
             ]
         }
     ]).then((answer) => {
         switch (answer.action) {
             case "View All Employees?":
-                viewAllEmployees();
-            break;
-
+                return viewAllEmployees();
             case "View All Employees By Roles?":
-                viewAllRoles();
-            break;
-
+                return viewAllRoles();
             case "View All Employees By Department?":
-                viewAllDepartments();
-            break;
-
+                return viewAllDepartments();
             case "Update Employee?":
-                updateEmployee();
-            break;
-
+                return updateEmployee();
             case "Add Employee?":
-                addEmployee();
-            break;
-
+                return addEmployee();
             case "Add Role?":
-                addRole();
-            break;
-
+                return addRole();
             case "Add Department?":
-                addDepartment();
-            break;
+                return addDepartment();
         }
-    });
+    })
 }
 
 // View All Employees
-const viewEmployee = () => {
+const viewAllEmployees = () => {
     connection.query('SELECT CONCAT(first_name, " ", last_name) AS Employee FROM employee', (err, res) => {
         if (err) throw err;
         console.table(res);
+        startPrompt()
     })
 }
 
 // View All Roles
-const viewRole = () => {
-    connection.query('SELECT title AS Role, salary AS Salary FROM role', (err, res) => {
+const viewAllRoles = () => {
+    connection.query("SELECT title AS Role, salary AS Salary FROM role", (err, res) => {
         if (err) throw err;
         console.table(res);
+        startPrompt()
     })
 }
 
 // View All Employees By Department
-const viewDepartment = () => {
-    connection.query('SELECT name AS Department FROM department', (err, res) => {
+const viewAllDepartments = () => {
+    connection.query("SELECT name AS Department FROM department", (err, res) => {
         if (err) throw err;
         console.table(res);
+        startPrompt()
     })
 }
 
@@ -240,5 +256,3 @@ const addDepartment = () => {
 
         })
 }
-
-init();
