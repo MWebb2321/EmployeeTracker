@@ -192,51 +192,66 @@ function updateEmployee() {
 }
 
 // Adding Employees
-function addEmployee() {
-  inquirer
-    .prompt(
-      ({
-        name: "firstName",
-        type: "input",
-        message: "Enter their first name? ",
-      },
-      {
-        name: "lastName",
-        type: "input",
-        message: "Enter their last name? ",
-      },
-      {
-        name: "role",
-        type: "list",
-        message: "What is their role? ",
-        choices: selectRole(),
-      },
-      {
-        name: "choice",
-        type: "rawList",
-        message: "What's the employees name? ",
-      })
-    )
-    .then(function (val) {
-      var roleId = selectRole().indexOf(val.role) + 1;
-      var managerId = selectManager().indexOf(val.choice) + 1;
-      connection.query(
-        "INSET INTO employee SET ?",
-        {
-          first_name: val.firstName,
-          last_name: val.lastName,
-          manager_Id: managerId,
-          role_Id: roleId,
-        },
-        function (err) {
-          if (err) throw err;
-          console.table(val);
-          startPrompt();
-        }
-      );
-    });
-}
+const addEmployee = () => {
+  let query = "SELECT id, first_name AS name FROM employees";
+  connection.query(query, (err, mgrs) => {
+    connection.query("SELECT id, title AS name FROM roles", (err, roles) => {
+      inquirer
+        .prompt([
+          {
+            name: "first_name",
+            type: "input",
+            message: `What is the employee's first name?`,
+          },
 
+          {
+            name: "last_name",
+            type: "input",
+            message: `What is the employee's last name?`,
+          },
+
+          {
+            name: "role",
+            type: "choice",
+            message: `What is the employee's role?`,
+            choices: roles,
+          },
+
+          {
+            name: "manager",
+            type: "choice",
+            message: `Who is the employee's manager?`,
+            choices: mgrs,
+          },
+        ])
+        .then((answer) => {
+          const rolesIndex = roles.filter((role) => {
+            return role.name === answer.role;
+          });
+          console.log(rolesIndex);
+          const roleId = rolesIndex[0].id;
+          const mgrIndex = mgrs.filter((mgr) => {
+            return mgr.name === answer.manager;
+          });
+          const mgrId = mgrIndex[0].id;
+          console.log(mgrIndex);
+          const query = "INSERT INTO employees SET ?";
+          const empInfo = {
+            first_name: answer.first_name,
+            last_name: answer.last_name,
+            role_id: roleId,
+            manager_id: mgrId,
+          };
+          connection.query(query, empInfo, (err, res) => {
+            console.log(
+              `${answer.first_name} ${answer.last_name} has been added!`
+            );
+            startPrompt();
+          });
+        });
+    });
+  });
+};
 // Add Employee Role
 const addRole = () => {
   inquirer
@@ -272,15 +287,15 @@ const addRole = () => {
 const addDepartment = () => {
   inquirer
     .prompt({
-      name: "department",
+      name: "name",
       type: "input",
       message: "What department you would like to add?",
     })
     .then((answer) => {
       const query = "INSERT INTO department (name) VALUES ?";
-      connection.query(query, { department: answer.department }, (err, res) => {
-        if (err) throw err;
-        console.table(res);
+      const departmentAdd = { name: answer.name };
+      connection.query(query, departmentAdd, (err, res) => {
+        console.log(`Department: ${answer.name} has been created`);
       });
     });
 };
