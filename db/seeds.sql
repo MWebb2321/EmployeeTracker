@@ -14,15 +14,15 @@ VALUE ("Salesperson", 80000, 1);
 INSERT INTO role (title, salary, department_id)
 VALUE ("Sales Lead", 100000, 1);
 INSERT INTO role (title, salary, department_id)
-VALUE ("Software Engineer", 120000, 2);
+VALUE ("Supervisor", 120000, 2);
 INSERT INTO role (title, salary, department_id)
-VALUE ("Lead Engineer", 150000, 2);
+VALUE ("Supervisor", 150000, 2);
 INSERT INTO role (title, salary, department_id)
-VALUE ("Accountant", 165000, 3);
+VALUE ("Assistant", 165000, 3);
 INSERT INTO role (title, salary, department_id)
-VALUE ("Lawyer", 190000, 4);
+VALUE ("Manager", 190000, 4);
 INSERT INTO role (title, salary, department_id)
-VALUE ("Legal Team Lead", 250000, 4);
+VALUE ("Manager", 250000, 4);
 
 --Employee Seeds
 INSERT INTO employee (first_name, last_name, manager_id, role_id)

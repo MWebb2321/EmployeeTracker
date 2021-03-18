@@ -131,52 +131,6 @@ function selectManager() {
   return managerArr;
 }
 
-// Adding Employees
-function addEmployee() {
-  inquirer
-    .prompt(
-      ({
-        name: "firstName",
-        type: "input",
-        message: "Enter their first name? ",
-      },
-      {
-        name: "lastName",
-        type: "input",
-        message: "Enter their last name? ",
-      },
-      {
-        name: "role",
-        type: "list",
-        message: "What is their role? ",
-        choices: selectRole(),
-      },
-      {
-        name: "choice",
-        type: "rawList",
-        message: "What's the employees name? ",
-      })
-    )
-    .then(function (val) {
-      var roleId = selectRole().indexOf(val.role) + 1;
-      var managerId = selectManager().indexOf(val.choice) + 1;
-      connection.query(
-        "INSET INTO employee SET ?",
-        {
-          first_name: val.firstName,
-          last_name: val.lastName,
-          manager_Id: managerId,
-          role_Id: roleId,
-        },
-        function (err) {
-          if (err) throw err;
-          console.table(val);
-          startPrompt();
-        }
-      );
-    });
-}
-
 // Updating Employee
 function updateEmployee() {
   connection.query(
@@ -235,6 +189,52 @@ function updateEmployee() {
         });
     }
   );
+}
+
+// Adding Employees
+function addEmployee() {
+  inquirer
+    .prompt(
+      ({
+        name: "firstName",
+        type: "input",
+        message: "Enter their first name? ",
+      },
+      {
+        name: "lastName",
+        type: "input",
+        message: "Enter their last name? ",
+      },
+      {
+        name: "role",
+        type: "list",
+        message: "What is their role? ",
+        choices: selectRole(),
+      },
+      {
+        name: "choice",
+        type: "rawList",
+        message: "What's the employees name? ",
+      })
+    )
+    .then(function (val) {
+      var roleId = selectRole().indexOf(val.role) + 1;
+      var managerId = selectManager().indexOf(val.choice) + 1;
+      connection.query(
+        "INSET INTO employee SET ?",
+        {
+          first_name: val.firstName,
+          last_name: val.lastName,
+          manager_Id: managerId,
+          role_Id: roleId,
+        },
+        function (err) {
+          if (err) throw err;
+          console.table(val);
+          startPrompt();
+        }
+      );
+    });
 }
 
 // Add Employee Role
