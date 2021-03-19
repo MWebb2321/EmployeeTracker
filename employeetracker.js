@@ -62,6 +62,7 @@ const viewAllEmployees = () => {
     (err, res) => {
       if (err) throw err;
       console.table(res);
+      startPrompt();
     }
   );
 };
@@ -114,21 +115,6 @@ async function getRoleId(roleTitle) {
     }
   );
   return roleIndex;
-}
-
-//
-var managerArr = [];
-function selectManager() {
-  connection.query(
-    "SELECT first_name, last_name FROM employee WHERE manager_id IS NULL",
-    function (err, res) {
-      if (err) throw err;
-      for (var i = 0; i < res.length; i++) {
-        managersArr.push(res[i].first_name);
-      }
-    }
-  );
-  return managerArr;
 }
 
 // Updating Employee
@@ -194,7 +180,7 @@ function updateEmployee() {
 // Adding Employees
 const addEmployee = () => {
   let query = "SELECT id, first_name AS name FROM employees";
-  connection.query(query, (err, mgrs) => {
+  connection.query(query, (err, res) => {
     connection.query("SELECT id, title AS name FROM roles", (err, roles) => {
       inquirer
         .prompt([
@@ -203,34 +189,25 @@ const addEmployee = () => {
             type: "input",
             message: `What is the employee's first name?`,
           },
-
           {
             name: "last_name",
             type: "input",
             message: `What is the employee's last name?`,
           },
-
           {
-            name: "role",
+            name: "title",
             type: "choice",
             message: `What is the employee's role?`,
-            choices: roles,
-          },
-
-          {
-            name: "manager",
-            type: "choice",
-            message: `Who is the employee's manager?`,
-            choices: mgrs,
+            choices: ["Salesperson", "Engineering", "Finance", "Legal"],
           },
         ])
         .then((answer) => {
-          const rolesIndex = roles.filter((role) => {
+          const rolesIndex = roles.answer((role) => {
             return role.name === answer.role;
           });
           console.log(rolesIndex);
           const roleId = rolesIndex[0].id;
-          const mgrIndex = mgrs.filter((mgr) => {
+          const mgrIndex = manager.filter((mgr) => {
             return mgr.name === answer.manager;
           });
           const mgrId = mgrIndex[0].id;
@@ -254,33 +231,39 @@ const addEmployee = () => {
 };
 // Add Employee Role
 const addRole = () => {
-  inquirer
-    .prompt([
-      {
-        name: "Title",
-        type: "input",
-        message: "What will be their title?",
-      },
-      {
-        name: "Salary",
-        type: "input",
-        message: "What will be their salary?",
-      },
-    ])
-    .then(function (res) {
-      connection.query(
-        "INSERT INTO role SET?",
+  connection.query("SELECT * FROM department", (err, res) => {
+    console.log(res);
+    inquirer
+      .prompt([
         {
-          title: res.Title,
-          salary: res.Salary,
+          name: "title",
+          type: "input",
+          message: "What is the name of the role?",
         },
-        function (err) {
-          if (err) throw err;
-          console.table(res);
-          // startPrompt();
-        }
-      );
-    });
+        {
+          name: "salary",
+          type: "input",
+          message: "What is the salary of this position?",
+        },
+        {
+          name: "department",
+          type: "choice",
+          message: "Where does this role belong?",
+        },
+      ])
+      .then((answer) => {
+        const departmentAdd = res.filter((dept) => {
+          return dept.name === answer.department;
+        });
+        const deptId = departmentAdd[0].id;
+        const query = "INSERT INTO roles SET ?";
+        const roleInfo = {
+          title: answer.title,
+          salary: answer.salary,
+          department_id: answer.deptId,
+        };
+      });
+  });
 };
 
 // Add Department
