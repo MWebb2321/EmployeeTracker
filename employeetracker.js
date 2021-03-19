@@ -179,9 +179,9 @@ function updateEmployee() {
 
 // Adding Employees
 const addEmployee = () => {
-  let query = "SELECT id, first_name AS name FROM employees";
-  connection.query(query, (err, res) => {
-    connection.query("SELECT id, title AS name FROM roles", (err, roles) => {
+  let query = "SELECT id, first_name AS name FROM employee";
+  connection.query(query, (err, manager) => {
+    connection.query("SELECT id, title AS name FROM role", (err, roles) => {
       inquirer
         .prompt([
           {
@@ -200,16 +200,17 @@ const addEmployee = () => {
             name: "role",
             type: "list",
             message: `What is the employee's role?`,
-            choices: [
-              "Salesperson",
-              "Sales Lead",
-              "Supervisor",
-              "Assistant",
-              "Manager",
-            ],
+            choices: roles,
+          },
+          {
+            name: "manager",
+            type: "list",
+            message: "Who is the manager?",
+            choices: manager,
           },
         ])
         .then((answer) => {
+          console.log(roles);
           const rolesIndex = roles.filter((role) => {
             return role.name === answer.role;
           });
@@ -239,7 +240,7 @@ const addEmployee = () => {
 };
 // Add Employee Role
 const addRole = () => {
-  connection.query("SELECT * FROM role", (err, res) => {
+  connection.query("SELECT * FROM department", (err, res) => {
     // console.log(res);
     inquirer
       .prompt([
@@ -266,18 +267,19 @@ const addRole = () => {
             department_id = res[a].id;
           }
         }
-
+        console.log(answer);
         connection.query(
           "INSERT INTO role SET ?",
           {
-            title: answer.new_role,
+            title: answer.role,
             salary: answer.salary,
             department_id: department_id,
           },
+
           function (err, res) {
             if (err) throw err;
             console.log("Your new role has been added!");
-            console.table("All Roles:", res);
+            // console.table("All Roles:", res);
             startPrompt();
           }
         );
@@ -295,10 +297,10 @@ const addDepartment = () => {
     })
     .then((answer) => {
       const query = `INSERT INTO department SET ?`;
-      const deptInfo = { input: answer.name };
-      if (err) throw err;
+      const deptInfo = { department_name: answer.name };
       connection.query(query, deptInfo, (err, res) => {
         console.log(`Department: ${answer.name} has been created!`);
+        if (err) throw err;
         startPrompt();
       });
     });
