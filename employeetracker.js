@@ -189,23 +189,25 @@ const addEmployee = () => {
             type: "input",
             message: `What is the employee's first name?`,
           },
+
           {
             name: "last_name",
             type: "input",
             message: `What is the employee's last name?`,
           },
+
           {
-            name: "title",
-            type: "choice",
+            name: "role",
+            type: "list",
             message: `What is the employee's role?`,
             choices: ["Salesperson", "Engineering", "Finance", "Legal"],
           },
         ])
         .then((answer) => {
-          const rolesIndex = roles.answer((role) => {
+          const rolesIndex = roles.filter((role) => {
             return role.name === answer.role;
           });
-          console.log(rolesIndex);
+          //   console.log(rolesIndex);
           const roleId = rolesIndex[0].id;
           const mgrIndex = manager.filter((mgr) => {
             return mgr.name === answer.manager;
